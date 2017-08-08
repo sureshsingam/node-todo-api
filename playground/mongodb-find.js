@@ -34,7 +34,7 @@ MongoClient.connect("mongodb://localhost:27017/TodoApp", (err, db)=>{
     // });
 
 
-    var mongoCursor =  db.collection('Users').find({name:"Suresh"});
+    var mongoCursor =  db.collection('Todos').find({text:"Walk the Dog"});
 
     var count = mongoCursor.count().then((count)=>{
         console.log(`Total count ${count} of users with same name`);
@@ -42,16 +42,38 @@ MongoClient.connect("mongodb://localhost:27017/TodoApp", (err, db)=>{
     {
         console.log("Unable to fetch count of users")
     });
+
     // To array returns a promise
+    // Get the object id from a field
+    // Then using the object id, get some other fireld
     mongoCursor.toArray().then((docs)=>{
         
-        console.log(JSON.stringify(docs,undefined,2));
+        var obj_id = docs[0]._id;
+        var obj_id_str = obj_id.toString();
+        var obj_id_hx = obj_id.valueOf();
+
+        var mongoCursor2 =  db.collection('Todos').find({ _id: obj_id});
+        mongoCursor2.toArray().then((docs2)=>{
+            console.log("Cursor 2", docs2[0].text, "completed status ",docs2[0].completed);
+        },(err2)=>{
+            console.log(err2)
+        });
+
+
+
+
     }, (err)=>{
         console.log('Unable to fetch Users',err);
     });
 
+    // console.log("Id is " ,obj_id);
+    // console.log(typeof obj_id)
+    // console.log("Id in String is " ,obj_id_str);
+    // console.log("Id in hex is " ,obj_id_hx);
+    // console.log(typeof obj_id_hx)
 
-
+        // now use the obtained id to get other parameters
+    
 
     // db.close();
 })
