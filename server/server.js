@@ -7,6 +7,8 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 
 var {User} = require('./models/user');
+const {ObjectID } = require('mongodb');
+
 
 var app = express();
 
@@ -32,11 +34,35 @@ app.post('/todos',(req,res)=>{
 app.get('/todos',(req,res)=>{
     Todo.find().then((todos)=>{
         res.send({todos});
+        console.log({todos}.todos[0])
     },(e)=>{
         res.status(400).send(e)
     })
 });
 
+// Get /todos/id
+app.get('/todos/:id',(req,res)=>{
+    
+    var requestParams = req.params
+    var id = requestParams.id
+    if(!ObjectID.isValid(id)){
+        console.log("Object ID is not valid")
+        return res.status(404).send()
+
+    }
+
+    Todo.findById(id).then((todos)=>{
+        if(!todos){
+            console.log("Valid object ID but not records returned")
+            return res.status(404).send()
+
+        }
+        res.send({todos});
+    }).catch((e)=>{
+        res.status(400).send(e);
+        console.log(2)
+    });
+});
 
 
 
